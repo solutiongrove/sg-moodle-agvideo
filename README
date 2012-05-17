@@ -1,0 +1,23 @@
+A moodle plugin that provides ability to map a Khan Academy video to an activity
+
+This is a beta release and has been tested on Moodle 2.1.1.
+
+This plugin requires the sg-moodle-agbase plugin (https://github.com/solutiongrove/sg-moodle-agbase)
+
+Copy the agvideo directory under your moodle install's mod directory.
+Once installed and enabled there will be a new activity "AG Video" that teachers can
+add to their courses.  Sample video of usage: http://www.youtube.com/watch?v=InVL1vFh-_4
+
+==========
+
+Author: Deds Castillo (deds@solutiongrove.com)
+Copyright (c) 2012 Solution Grove (http://solutiongrove.com)
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
