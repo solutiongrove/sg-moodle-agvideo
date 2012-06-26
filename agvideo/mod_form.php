@@ -49,13 +49,55 @@ class mod_agvideo_mod_form extends moodleform_mod {
         // Options settings
         $mform->addElement('header', 'optionssection', get_string('optionsheader', 'agvideo'));
 
-        $mform->addElement('checkbox', 'printheading', get_string('printheading', 'agvideo'));
-        $mform->setDefault('printheading', $config->printheading);
-        $mform->setAdvanced('printheading', $config->printheading_adv);
+        if ($this->current->instance) {
+            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
+        } else {
+            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
+        }
+        if (count($options) == 1) {
+            $mform->addElement('hidden', 'display');
+            $mform->setType('display', PARAM_INT);
+            reset($options);
+            $mform->setDefault('display', key($options));
+        } else {
+            $mform->addElement('select', 'display', get_string('displayselect', 'agvideo'), $options);
+            $mform->setDefault('display', $config->display);
+            $mform->setAdvanced('display', $config->display_adv);
+            $mform->addHelpButton('display', 'displayselect', 'agvideo');
+        }
 
-        $mform->addElement('checkbox', 'printintro', get_string('printintro', 'agvideo'));
-        $mform->setDefault('printintro', $config->printintro);
-        $mform->setAdvanced('printintro', $config->printintro_adv);
+        if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
+            $mform->addElement('text', 'popupwidth', get_string('popupwidth', 'agvideo'), array('size'=>3));
+            if (count($options) > 1) {
+                $mform->disabledIf('popupwidth', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
+            }
+            $mform->setType('popupwidth', PARAM_INT);
+            $mform->setDefault('popupwidth', $config->popupwidth);
+            $mform->setAdvanced('popupwidth', $config->popupwidth_adv);
+
+            $mform->addElement('text', 'popupheight', get_string('popupheight', 'agvideo'), array('size'=>3));
+            if (count($options) > 1) {
+                $mform->disabledIf('popupheight', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
+            }
+            $mform->setType('popupheight', PARAM_INT);
+            $mform->setDefault('popupheight', $config->popupheight);
+            $mform->setAdvanced('popupheight', $config->popupheight_adv);
+        }
+
+        if (array_key_exists(RESOURCELIB_DISPLAY_AUTO, $options) or
+          array_key_exists(RESOURCELIB_DISPLAY_FRAME, $options) or
+          array_key_exists(RESOURCELIB_DISPLAY_NEW, $options) or
+          array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
+            $mform->addElement('checkbox', 'printheading', get_string('printheading', 'agvideo'));
+            $mform->disabledIf('printheading', 'display', 'eq', RESOURCELIB_DISPLAY_OPEN);
+            $mform->setDefault('printheading', $config->printheading);
+            $mform->setAdvanced('printheading', $config->printheading_adv);
+
+            $mform->addElement('checkbox', 'printintro', get_string('printintro', 'agvideo'));
+            $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_OPEN);
+            $mform->setDefault('printintro', $config->printintro);
+            $mform->setAdvanced('printintro', $config->printintro_adv);
+        }
 
         //-------------------------------------------------------
         $this->standard_coursemodule_elements();
@@ -72,6 +114,12 @@ class mod_agvideo_mod_form extends moodleform_mod {
             }
             if (isset($displayoptions['printheading'])) {
                 $default_values['printheading'] = $displayoptions['printheading'];
+            }
+            if (!empty($displayoptions['popupwidth'])) {
+                $default_values['popupwidth'] = $displayoptions['popupwidth'];
+            }
+            if (!empty($displayoptions['popupheight'])) {
+                $default_values['popupheight'] = $displayoptions['popupheight'];
             }
         }
     }

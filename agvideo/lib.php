@@ -106,6 +106,11 @@ function agvideo_add_instance($data, $mform) {
     require_once($CFG->dirroot.'/mod/agvideo/locallib.php');
 
     $data->name = get_string('videoname', 'agvideo').$data->name;
+    $displayoptions = array();
+    if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
+        $displayoptions['popupwidth']  = $data->popupwidth;
+        $displayoptions['popupheight'] = $data->popupheight;
+    }
     $displayoptions['printheading'] = (int)!empty($data->printheading);
     $displayoptions['printintro']   = (int)!empty($data->printintro);
     $data->displayoptions = serialize($displayoptions);
@@ -133,6 +138,11 @@ function agvideo_update_instance($data, $mform) {
 
     require_once($CFG->dirroot.'/mod/agvideo/locallib.php');
 
+    $displayoptions = array();
+    if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
+        $displayoptions['popupwidth']  = $data->popupwidth;
+        $displayoptions['popupheight'] = $data->popupheight;
+    }
     $displayoptions['printheading'] = (int)!empty($data->printheading);
     $displayoptions['printintro']   = (int)!empty($data->printintro);
     $data->displayoptions = serialize($displayoptions);

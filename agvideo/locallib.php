@@ -126,6 +126,56 @@ function agvideo_print_intro($agvideo, $cm, $course, $ignoresettings=false) {
 
 
 /**
+ * Display agvideo frames.
+ * @param object $agvideo
+ * @param object $cm
+ * @param object $course
+ * @return does not return
+ */
+function agvideo_display_frame($agvideo, $cm, $course) {
+    global $PAGE, $OUTPUT, $CFG;
+    $frame = optional_param('frameset', 'main', PARAM_ALPHA);
+
+    if ($frame === 'top') {
+        $PAGE->set_pagelayout('frametop');
+        agvideo_print_header($agvideo, $cm, $course);
+        agvideo_print_heading($agvideo, $cm, $course);
+        agvideo_print_intro($agvideo, $cm, $course);
+        echo $OUTPUT->footer();
+        die;
+    } else {
+        $config = get_config('agvideo');
+        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $exteurl = agvideo_get_full_url($agvideo, $cm, $course, $config);
+        $navurl = "$CFG->wwwroot/mod/agvideo/view.php?id=$cm->id&amp;frameset=top";
+        $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+        $courseshortname = format_string($course->shortname, true, array('context' => $coursecontext));
+        $title = strip_tags($courseshortname.': '.format_string($agvideo->name));
+        $framesize = empty($config->framesize) ? 130 : $config->framesize;
+        $modulename = s(get_string('modulename','agvideo'));
+        $dir = get_string('thisdirection', 'langconfig');
+
+        $extframe = <<<EOF
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html dir="$dir">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>$title</title>
+  </head>
+  <frameset rows="$framesize,*">
+    <frame src="$navurl" title="$modulename"/>
+    <frame src="$exteurl" title="$modulename"/>
+  </frameset>
+</html>
+EOF;
+
+        @header('Content-Type: text/html; charset=utf-8');
+        echo $extframe;
+        die;
+    }
+}
+
+/**
  * Print agvideo info and link.
  * @param object $agvideo
  * @param object $cm
@@ -141,7 +191,19 @@ function agvideo_print_workaround($agvideo, $cm, $course) {
 
     $fullurl = agvideo_get_full_url($agvideo, $cm, $course);
 
-    $extra = '';
+    $display = $agvideo->display;
+    if ($display == RESOURCELIB_DISPLAY_POPUP) {
+        $jsfullurl = addslashes_js($fullurl);
+        $options = empty($agvideo->displayoptions) ? array() : unserialize($agvideo->displayoptions);
+        $width  = empty($options['popupwidth'])  ? 620 : $options['popupwidth'];
+        $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
+        $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
+        $extra = "onclick=\"window.open('$jsfullurl', '', '$wh'); return false;\"";
+    } else if ($display == RESOURCELIB_DISPLAY_NEW) {
+        $extra = "onclick=\"this.target='_blank';\"";
+    } else {
+        $extra = '';
+    }
 
     echo '<div class="agurlworkaround">';
     print_string('clicktoopen', 'agvideo', "<a href=\"$fullurl\" $extra>".get_string('video', 'agvideo')."</a>");
